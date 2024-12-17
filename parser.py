@@ -1,5 +1,3 @@
-# Para ler e procesar o log
-
 import re
 from collections import defaultdict
 
@@ -10,14 +8,12 @@ def parse_log(file_path):
     
     with open(file_path, 'r') as file:
         for line in file:
-            # Identificar o início de uma nova partida
             if "InitGame" in line:
                 if current_game:
                     games[f"game_{game_number}"] = current_game
                 game_number += 1
                 current_game = {"total_kills": 0, "players": set(), "kills": defaultdict(int), "kills_by_means": defaultdict(int)}
             
-            # Contar kills
             if "Kill:" in line:
                 current_game["total_kills"] += 1
                 match = re.search(r"Kill: \d+ (\d+) (\d+): (.+) killed (.+) by (\w+)", line)
@@ -32,11 +28,9 @@ def parse_log(file_path):
                     current_game["players"].add(victim)
                     current_game["kills_by_means"][death_cause] += 1
 
-        # Salvar o último jogo
         if current_game:
             games[f"game_{game_number}"] = current_game
 
-    # Converter jogadores para lista
     for game in games.values():
         game["players"] = list(game["players"])
     
